@@ -18,6 +18,13 @@
 - [Hardhat](https://hardhat.org/) - Development environment, testing framework and asset pipeline for blockchains using the Ethereum Virtual Machine (EVM).
 - [Ox](https://docs.0x.org/) - Handles NFT transfer and payment between buyers and sellers.
 - [Azuki](https://github.com/chiru-labs/ERC721A) - Saves significant gas savings for minting multiple NFTs in a single transaction.
+
+#
+### Run the DApp Locally
+#### Open new terminal window and clone this repository
+```
+git clone https://github.com/Sam-Devs/NFT-Marketplace.git
+```
 #
 ### Interact with the contract in the contract folder
 - Try running some of the following tasks in the contract folder [Contract](https://github.com/Sam-Devs/NFT-Marketplace/tree/main/contract):
@@ -51,32 +58,3 @@ npx hardhat run scripts/deploy.js
 - Request and get test USDC for the metamask account from [Filswan Faucet](https://calibration-faucet.filswan.com/#/dashboard) to buy NFTs.
 - DOD NFT Marketplace Smart Contract is deployed to polygon Testnet - [0x4D737c9F72fC9AbA9140Cecb65cd5DD7F43eDA8a](https://mumbai.polygonscan.com/address/0x4D737c9F72fC9AbA9140Cecb65cd5DD7F43eDA8a)
 - Access DOD Marketplace DApp at [DOD-NFT-marketplace](https://dod-nft-marketplace.netlify.app/) and start minting your DOD NFT.
-
-#
-### Run the DApp Locally
-```
-#### Open new terminal window and clone this repository
-```
-git clone (add github repo)
-```
-#### Install dependencies
-```
-npm install
-```
-#### Compile smart contract
-```
-npx hardhat compile
-```
-#### Deploy smart contract 
-```
-npx hardhat run scripts/deploy.js --network (network) 
-```
-#### Test smart contract
-```
-npx hardhat test
-```
-#### Start DApp
-```
-npm start
-```
-- Open metamask browser wallet and connect network.

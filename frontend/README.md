@@ -27,10 +27,6 @@
 - Access DOD Marketplace DApp at [DOD-NFT-marketplace](https://dod-nft-marketplace.netlify.app/) and start minting your Crypto Boys.
 #
 ### Run the DApp Locally
-#### Open new terminal window and clone this repository
-```
-git clone 
-```
 #### Install dependencies
 ```
 npm i
