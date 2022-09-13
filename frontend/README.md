@@ -21,7 +21,7 @@
 ### Interact with the deployed DApp
 - DOD Marketplace DApp requires [Metamask](https://metamask.io/) browser wallet extension to interact with.
 - Connect metamask browser wallet to Polygon Test Network (matic).
-- Request and get test etheres for the metamask account from [Polygon matic Faucet](https://faucet.polygon.technology/) to make transactions.
+- Request and get test matic for the metamask account from [Polygon matic Faucet](https://faucet.polygon.technology/) to make transactions.
 - Request and get test USDC for the metamask account from [Filswan Faucet](https://calibration-faucet.filswan.com/#/dashboard) to buy NFTs.
 - DOD NFT Marketplace Smart Contract is deployed to polyon Testnet - [0x4D737c9F72fC9AbA9140Cecb65cd5DD7F43eDA8a](https://mumbai.polygonscan.com/address/0x4D737c9F72fC9AbA9140Cecb65cd5DD7F43eDA8a)
 - Access DOD Marketplace DApp at [DOD-NFT-marketplace](https://dod-nft-marketplace.netlify.app/) and start minting your Crypto Boys.
