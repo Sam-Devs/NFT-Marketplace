@@ -27,29 +27,17 @@
 - Access DOD Marketplace DApp at [DOD-NFT-marketplace](https://dod-nft-marketplace.netlify.app/) and start minting your Crypto Boys.
 #
 ### Run the DApp Locally
-```
 #### Open new terminal window and clone this repository
 ```
-git clone (add github repo)
+git clone 
 ```
 #### Install dependencies
 ```
-npm install
+npm i
 ```
-#### Compile smart contract
+#### Start App
+
 ```
-npx hardhat compile
-```
-#### Deploy smart contract 
-```
-npx hardhat run scripts/deploy.js --network (network) 
-```
-#### Test smart contract
-```
-npx hardhat test
-```
-#### Start DApp
-```
-npm start
+yarn start
 ```
 - Open metamask browser wallet and connect network.
