@@ -57,4 +57,4 @@ npx hardhat run scripts/deploy.js
 - Request and get test matic for the metamask account from [Polygon matic Faucet](https://faucet.polygon.technology/) to make transactions.
 - Request and get test USDC for the metamask account from [Filswan Faucet](https://calibration-faucet.filswan.com/#/dashboard) to buy NFTs.
 - DOD NFT Marketplace Smart Contract is deployed to polygon Testnet - [0x4D737c9F72fC9AbA9140Cecb65cd5DD7F43eDA8a](https://mumbai.polygonscan.com/address/0x4D737c9F72fC9AbA9140Cecb65cd5DD7F43eDA8a)
-- Access DOD Marketplace DApp at [DOD-NFT-marketplace](https://dod-nft-marketplace.netlify.app/) and start minting your DOD NFT.
+- Access DOD Marketplace DApp at [DODNFT-Marketplace](https://dod-nft-marketplace.netlify.app/) and start minting your DOD NFT.
