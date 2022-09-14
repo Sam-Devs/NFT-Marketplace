@@ -50,8 +50,9 @@ describe("NFTMarket", function () {
     )
 
     // /* eCreating  market items */
+    // ommitment hash is gotten from the hash of the seller address, token Id and order nonce(0x sdk)
     await nftMarketplace
-      .createMarketItem(1, { value: listingPrice });
+      .createMarketItem(1, commitmentHash, { value: listingPrice });
 
     
     // checking a listed NFT
@@ -66,7 +67,8 @@ describe("NFTMarket", function () {
      false
     )
     // Creating a market sale for an item
-   await nftMarketplace.connect(buyerAddress).createMarketSale(1);
+    // salt is the order nonce
+   await nftMarketplace.connect(buyerAddress).createMarketSale(1, salt);
     const soldDod = await nftMarketplace.oneDod(1)
       expect(soldDod.listed).to.equal(
      false

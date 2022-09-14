@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+
+
+const Navbar = ({ disconnect }) => {
+ 
   return (
     <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
       <div className="container">
-        {/* <img src={icon} alt="" /> */}
         <Link to="/" className="navbar-brand ml-2">
           DOD NFTs
         </Link>
@@ -46,11 +48,26 @@ const Navbar = () => {
                 Queries
               </Link>
             </li>
+            <li
+              style={{
+                border: "1px solid red",
+                background:'crimson',
+                padding: "0px",
+                borderRadius:'5px',
+                fontWeight:'700'
+              }}
+              className="border-grey hover:border-white"
+              onClick={()=>disconnect()}
+            >
+              <Link to="/" className="nav-link" style={{ color: "white" }}>
+                Disconnect
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
   );
-};
+}
 
 export default Navbar;

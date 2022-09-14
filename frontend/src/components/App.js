@@ -4,7 +4,7 @@ import toast, { Toaster, ToastBar } from 'react-hot-toast';
 import "./App.css";
 import Web3 from "web3";
 import { NftSwapV4 } from '@traderxyz/nft-swap-sdk'
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
 import DODnfts from "../abis/DodNfts.json";
 import FormAndPreview from "../components/FormAndPreview/FormAndPreview";
 import AllDodNfts from "./AllDodNfts/AllDodNfts";
@@ -29,6 +29,12 @@ const ipfs = ipfsClient({
         }
 });
 
+// useEffect(() => {
+//   window.ethereum.on("accountsChanged", (accounts) => {
+//     if (accounts.length > 0) this.loadBlockchainData();
+//     else this.setState({ metamaskConnected: false });
+//   });
+// }, []);
 class App extends Component {
   constructor(props) {
     super(props);
@@ -48,15 +54,30 @@ class App extends Component {
       colorsUsed: [],
       lastMintTime: null,
       chainId: 80001,
-      contractAddress: '0x4D737c9F72fC9AbA9140Cecb65cd5DD7F43eDA8a',
-      text: ''
+      contractAddress: "0x54050DE9c672ecDe2028882E17767eE63D1C89D1",
+      text: "",
     };
   }
 
+    disconnect = async() => {
+    this.setState({ metamaskConnected: false });
+    console.log('disconnected')
+   }
+  
   componentDidMount = async () => {
     await this.loadWeb3();
     await this.loadBlockchainData();
     await this.setMintBtnTimer();
+    window.ethereum.on("accountsChanged", async () => {
+      await this.loadBlockchainData();
+    });
+    window.ethereum.on("chainChanged", async () => {
+      const web3 = new Web3(window.web3.currentProvider);
+       const networkId = await web3.eth.net.getId();
+       const networkData = this.state.chainId;
+       if (networkData === networkId) await this.loadBlockchainData();
+         else this.setState({ contractDetected: false });
+    });
   };
 
   setMintBtnTimer = () => {
@@ -130,15 +151,16 @@ class App extends Component {
         let dodNftCount = await DodNftContract.methods.DodCounter().call({from: this.state.accountAddress})
          dodNftCount = dodNftCount.toNumber()
         this.setState({ dodNftCount});
-
-        for (var i = 1; i <= dodNftCount; i++) {
-          console.log(i)
-          const DodNft = await DodNftContract.methods.oneDod(i).call({from: this.state.accountAddress})
           this.setState({
-            DODnfts: [...this.state.DODnfts, DodNft],
+            DODnfts: [],
           });
-        }
-
+        const DodNfts = await DodNftContract.methods
+          .fetchMarketItems
+          .call({ from: this.state.accountAddress });
+          this.setState({
+            DODnfts: DodNfts,
+          });
+        // console.log(DodNfts);
         let totalTokensMinted = await DodNftContract
           .methods.totalSupply().call({from: this.state.accountAddress})
         totalTokensMinted = totalTokensMinted.toNumber();
@@ -196,12 +218,19 @@ class App extends Component {
           // window.location.reload()
           toast.success(<div><h4 style={{ color: 'white', fontWeight:'600'}}>Mint successful</h4> <p>Block confirmation could take a few minutes.</p> <p> Refresh marketplace in a few minutes to view newly minted NFT</p></div>, {
           });
-       })
+          this.loadBlockchainData()
+        })
 
       } catch (error) {
         console.log(error, error.message)
         this.setState({ loading: false });
-        toast.error(error.message? error.message.slice(0,30) : 'Mint failed');
+        toast.error(
+          error.message
+            ? `${error.message.slice(0, 35)} ${
+                error.message.length > 35 ? "..." : ""
+              }`
+            : "Mint failed"
+        );
       }
       
     }
@@ -213,8 +242,7 @@ class App extends Component {
     try {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         const signer = provider.getSigner(this.state.accountAddress);
-       const nftSwapSdk = new NftSwapV4(provider, signer, this.state.chainId);
-
+      const nftSwapSdk = new NftSwapV4(provider, signer, this.state.chainId);
          const DodNft = {
           tokenAddress: this.state.contractAddress, // CryptoPunk contract address
           tokenId: tokenId, // Token Id of the CryptoPunk we want to swap
@@ -256,24 +284,51 @@ class App extends Component {
           }
         );
         const signedOrder = await nftSwapSdk.signOrder(order);
-        await nftSwapSdk.postOrder(signedOrder, this.state.chainId).then( async ()=>{
+      await nftSwapSdk.postOrder(signedOrder, this.state.chainId).then(async (order) => {
+        const nonce = order.order.nonce
+        const commitment = ethers.utils.solidityKeccak256(
+          ["address", "uint256", "uint256"],
+          [this.state.accountAddress, tokenId, nonce]
+        );
               const listingFee = await this.state.DodNftContract.methods
               .getListingPrice().call({from: this.state.accountAddress})
             await this.state.DodNftContract.methods
-              .createMarketItem(tokenId, )
-              .send({ from: this.state.accountAddress, to:this.state.contractAddress, value:listingFee })
-              .on('transactionHash', () => {  
-                  this.setState({ loading: false });
-                  // window.location.reload();
-                   toast.success(<div><h4 style={{ color: 'white', fontWeight:'600'}} >NFT listed successfully</h4> <p>Block confirmation could take a few minutes.</p> <p> Refresh marketplace in a few minutes to view newly listed NFT</p></div>, {
-                  })
-                console.log('for sale activated')
-           })
+              .createMarketItem(tokenId, commitment)
+              .send({
+                from: this.state.accountAddress,
+                to: this.state.contractAddress,
+                value: listingFee,
+              })
+              .on("transactionHash", () => {
+                this.setState({ loading: false });
+                // window.location.reload();
+                toast.success(
+                  <div>
+                    <h4 style={{ color: "white", fontWeight: "600" }}>
+                      NFT listed successfully
+                    </h4>{" "}
+                    <p>Block confirmation could take a few minutes.</p>{" "}
+                    <p>
+                      {" "}
+                      Refresh marketplace in a few minutes to view newly listed
+                      NFT
+                    </p>
+                  </div>,
+                  {}
+                );
+                 this.loadBlockchainData();
+              });
          })
       } catch (error) {
         console.log('error', error)
         this.setState({ loading: false });
-        toast.error(error.message? error.message.slice(0,30) : ' NFT Listing failed');
+        toast.error(
+          error.message
+            ? `${error.message.slice(0, 35)} ${
+                error.message.length > 35 ? "..." : ""
+              }`
+            : " NFT Listing failed"
+        );
     }
   };
 
@@ -289,7 +344,6 @@ class App extends Component {
             nftTokenId: tokenId,
             sellOrBuyNft: "sell", // Only show asks (sells) for this NFT (excludes asks)
           });
-          console.log(order)
       const nonce = order.orders[0].order.nonce;
       await nftSwapSdk.cancelOrder(nonce, 'ERC721').then(async ()=>{
         await this.state.DodNftContract.methods
@@ -306,7 +360,11 @@ class App extends Component {
       console.log('error', error)
         this.setState({ loading: false });
         toast.error(
-          error.message ? error.message.slice(0, 30) : "NFT unlisting failed"
+          error.message
+            ? `${error.message.slice(0, 35)} ${
+                error.message.length > 35 ? "..." : ""
+              }`
+            : "NFT unlisting failed"
         );
     }
   };
@@ -329,7 +387,11 @@ class App extends Component {
       console.log('error', error, error.message)
       this.setState({ loading: false });
       toast.error(
-        error.message ? error.message.slice(0, 30) : "NFT price change failed"
+        error.message
+          ? `${error.message.slice(0, 35)} ${
+              error.message.length > 35 ? "..." : ""
+            }`
+          : "NFT price change failed"
       );
     }
   };
@@ -364,33 +426,47 @@ class App extends Component {
           `Approved ${payment_token.tokenAddress} contract to swap with 0x. TxHash: ${approvalTxReceipt.transactionHash})`
         );
       }
-
       
        const order = await nftSwapSdk.getOrders({
             nftToken: this.state.contractAddress,
             nftTokenId: tokenId,
             sellOrBuyNft: "sell", // Only show asks (sells) for this NFT (excludes asks)
           });
-        const foundOrder = order.orders[0];
-        console.log(foundOrder)
+       const foundOrder = order.orders[0];
+       console.log(foundOrder.order.nonce);
         const fillTx = await nftSwapSdk.fillSignedOrder(foundOrder.order).then(async()=>{
           console.log('yes')
           await this.state.DodNftContract.methods
-          .createMarketSale(tokenId)
-          .send({ from: this.state.accountAddress })
-          .on('transactionHash', () => {  
-          this.setState({ loading: false });
-           toast.success(<div><h4 style={{ color: 'white', fontWeight:'600'}}>DOD NFT purchase successfully</h4>. <p>Block confirmation could take a few minutes.</p> <p> Refresh marketplace in a few minutes to view newly purchased NFT</p></div>, {
-              })
-       })
-      })
-      const txReceipt = await fillTx.wait();
-      console.log(txReceipt)
+            .createMarketSale(Number(tokenId), foundOrder.order.nonce)
+            .send({ from: this.state.accountAddress })
+            .on("transactionHash", () => {
+              this.setState({ loading: false });
+              toast.success(
+                <div>
+                  <h4 style={{ color: "white", fontWeight: "600" }}>
+                    DOD NFT purchase successfully
+                  </h4>
+                  . <p>Block confirmation could take a few minutes.</p>{" "}
+                  <p>
+                    {" "}
+                    Refresh marketplace in a few minutes to view newly purchased
+                    NFT
+                  </p>
+                </div>,
+                {}
+              );
+            });
+          })
+      await fillTx.wait();
      } catch (error) {
       console.log(error)
       this.setState({ loading: false });
       toast.error(
-        error.message ? error.message.slice(0, 30) : "NFT purchase failed"
+        error.message
+          ? `${error.message.slice(0, 35)} ${
+              error.message.length > 35 ? "..." : ""
+            }`
+          : "NFT purchase failed"
       );
      }
       
@@ -435,7 +511,7 @@ class App extends Component {
             )}
     </ToastBar>
         )}
-        </Toaster>;
+        </Toaster>
         {!this.state.metamaskConnected ? (
           <ConnectToMetamask connectToMetamask={this.connectToMetamask} />
         ) : !this.state.contractDetected ? (
@@ -445,7 +521,7 @@ class App extends Component {
         ) : (
           <>
             <HashRouter basename="/">
-              <Navbar />
+            <Navbar disconnect={this.disconnect} />
               <Route
                 path="/"
                 exact
@@ -500,7 +576,7 @@ class App extends Component {
               />
             </HashRouter>
           </>
-        )}
+         )}
       </div>
     );
   }

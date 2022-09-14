@@ -28,6 +28,7 @@ contract NFTMarketPlace is ERC721A, IERC721Receiver{
 
      mapping(uint256 => DodNFT) public oneDod;
      mapping(string => bool) public tokenNameExists;
+     mapping(uint256=> bytes32) private tokenIdToCommitment;
     
     struct DodNFT{
       uint256 tokenId;
@@ -98,11 +99,13 @@ contract NFTMarketPlace is ERC721A, IERC721Receiver{
     }
 
      function createMarketItem(
-      uint256 tokenId
+      uint256 tokenId,
+      bytes32 _commitment
     ) public payable {
       require(msg.value == listingPrice, "ERR-1.0.3:Price must be equal to listing price");
       DodNFT storage newDod = oneDod[tokenId];
       newDod.listed = true;
+      tokenIdToCommitment[tokenId] = _commitment;
       emit MarketItemCreated(
         tokenId,
         msg.sender,
@@ -123,10 +126,10 @@ contract NFTMarketPlace is ERC721A, IERC721Receiver{
     }
         /* Records the sale of a marketplace item */
     function createMarketSale(
-      uint256 tokenId
+      uint256 tokenId, uint256 salt
       ) public {
       DodNFT storage newDod = oneDod[tokenId];
-      // require(msg.sender == newDod.currentOwner, 'ERR-1.0.6: Only ');
+      require(keccak256(abi.encodePacked(newDod.currentOwner, tokenId, salt)) == tokenIdToCommitment[tokenId], 'ERR-1.0.6: Wrong verifcation.');
       address prevOwner = newDod.currentOwner;
       uint256 currentTransfers = newDod.numberOfTransfers;
       uint price = newDod.price;
@@ -215,4 +218,3 @@ contract NFTMarketPlace is ERC721A, IERC721Receiver{
       newDod.listed = false;
     }
 }
-
