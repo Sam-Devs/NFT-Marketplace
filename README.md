@@ -29,26 +29,9 @@ git clone https://github.com/Sam-Devs/NFT-Marketplace.git
 ### Interact with the contract in the contract folder
 - Try running some of the following tasks in the contract folder [Contract](https://github.com/Sam-Devs/NFT-Marketplace/tree/main/contract):
 
-```shell
-npx hardhat help
-npx hardhat test test/smart-contract-test.js
-npx hardhat test test/0x-smart-contract-test.js
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
 #
 ### Interact with the frontend in the frontend folder
 - Try running some of the following tasks in the frontend folder [Frontend](https://github.com/Sam-Devs/NFT-Marketplace/tree/main/frontend):
-
-```shell
-npx hardhat help
-npx hardhat test test/smart-contract-test.js
-npx hardhat test test/0x-smart-contract-test.js
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
 
 #
 ### Interact with the deployed DApp
