@@ -13,7 +13,7 @@ npx hardhat compile
 ```
 #### Test smart contract
 ```
-npx hardhat test test/smart-contract-test.js npx hardhat test test/0x-smart-contract-test.js
+npx hardhat test test/0x-smart-contract-test.js npx hardhat test test/0x-smart-contract-test.js
 
 ```
 #### Deploy smart contract 
